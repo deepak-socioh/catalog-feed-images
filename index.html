@@ -38,16 +38,15 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Enter URL</h5>
-                        <form id="urlForm">
-                            <div class="form-group">
-                                <label for="urlInput">URL</label>
+                        <h5 class="card-title">Enter Meta Catalog Feed URL</h5>
+                        <form id="urlForm" class="row">
+                            <div class="form-group col-9" >
                                 <input type="text" class="form-control" id="urlInput" placeholder="Enter URL">
                                 <div class="invalid-feedback">
                                     Please enter a valid URL.
                                 </div>
                             </div>
-                            <button id="sub-button" type="submit" class="btn btn-primary">Submit</button>
+                            <button id="sub-button" style="height: 38px;" type="submit" class="btn btn-primary col-3">Submit</button>
                             
                             <div id="spinner" class="spinner-border" role="status">
                                 <span class="visually-hidden"></span>
@@ -70,7 +69,7 @@
         document.getElementById('spinner').style.display = 'none';
         document.getElementById('urlForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the default form submission
-            
+            document.querySelector('.count').textContent = "";
             var urlInput = document.getElementById('urlInput');
             var urlValue = urlInput.value.trim();
 
