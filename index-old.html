@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<head>
+	<title>Reads the XML data using JavaScript</title>
+
+	<style type="text/css">
+		img {
+			width:200px;
+		}
+		.item-single {
+			display: inline-block;
+			margin-right: 10px;
+			margin-bottom: 10px;
+		}
+		.text {
+			margin-bottom: 5px;
+			font-weight: bold;
+		}
+	</style>
+
+	<!--JavaScript-->
+	<script>
+		function loadXMLDoc() {
+			let xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function () {
+
+				// Request finished and response 
+				// is ready and Status is "OK"
+				if (this.readyState == 4 && this.status == 200) {
+					empDetails(this);
+				}
+			};
+
+			// employee.xml is the external xml file
+			// let xmlurl = "https://s3.amazonaws.com/socioh-public-production/ABOGB27/feed_xml/tmp/productCatalogFeed_ABQK3Ol_2024-07-15T10:59:24.079Z.xml"
+			//read input from input field xmlurl
+            let xmlurl = document.getElementById("xmlUrl").value;
+
+            xmlhttp.open("GET", xmlurl , true);
+			xmlhttp.send();
+		}
+
+		function empDetails(xml) {
+			let i;
+			let xmlDoc = xml.responseXML;
+			var duplicates = [];
+			var all = [];
+			let x = xmlDoc.getElementsByTagName("item");
+			console.log("--total items", x)
+			// // Start to fetch the data by using TagName 
+			var highest = 0;
+			var container = document.getElementById("images");
+			for (i = 0; i < x.length; i++) {
+				var item = x[i];
+				var img = item.getElementsByTagName("g:image_link");
+				var id = item.getElementsByTagName("g:id")[0].innerHTML;
+				if(img && img[0] && img[0].innerHTML) {
+					var src = img[0].innerHTML;
+					let divContainer = document.createElement('div');
+					let text = document.createElement('div');
+					text.textContent = "Prod " + (i+1) + " - " + id;
+					text.classList.add("text");
+		            divContainer.appendChild(text);
+
+					let imgelem = document.createElement('img');
+		            imgelem.src =src;
+					divContainer.classList.add("item-single")
+
+		            divContainer.appendChild(imgelem);
+		            container.appendChild(divContainer);
+				}
+			}
+
+			
+		}
+	</script>
+</head>
+
+<body>
+	<center>
+        <input type="url" id="xmlUrl" placeholder="Enter XML URL">
+
+		<button type="button" class="button" onclick="loadXMLDoc()">
+			Load Xml
+		</button>
+
+		<div id="images"></div>
+	</center>
+
+	<br><br>
+	<table id="id"></table>
+</body>
+
+</html>

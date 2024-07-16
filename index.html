@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Input Form</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css">
+		img {
+			width:200px;
+            border: 0.1px solid rgb(128 128 128 / 25%)
+		}
+		.item-single {
+			display: inline-block;
+            margin-bottom: 10px;
+            border: 1px solid grey;
+            margin-top: 10px;
+            margin-right: 10px;
+            padding: 5px;
+		}
+		.text {
+			margin-bottom: 5px;
+			font-weight: bold;
+		}
+        .title {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+	</style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Enter URL</h5>
+                        <form id="urlForm">
+                            <div class="form-group">
+                                <label for="urlInput">URL</label>
+                                <input type="text" class="form-control" id="urlInput" placeholder="Enter URL">
+                                <div class="invalid-feedback">
+                                    Please enter a valid URL.
+                                </div>
+                            </div>
+                            <button id="sub-button" type="submit" class="btn btn-primary">Submit</button>
+                            
+                            <div id="spinner" class="spinner-border" role="status">
+                                <span class="visually-hidden"></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="count"></div>
+        <div id="images"></div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        //hide the spinner
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('urlForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            
+            var urlInput = document.getElementById('urlInput');
+            var urlValue = urlInput.value.trim();
+
+            // Simple URL validation
+            var urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?(\?.*)?(#.*)?\.xml$/;
+
+            if (!urlValue) {
+                urlInput.classList.add('is-invalid');
+                urlInput.nextElementSibling.textContent = 'URL field cannot be empty.';
+            } 
+            // else if (!urlPattern.test(urlValue)) {
+            //     urlInput.classList.add('is-invalid');
+            //     urlInput.nextElementSibling.textContent = 'Please enter a valid xml URL';
+            // } 
+            else {
+                urlInput.classList.remove('is-invalid');
+                urlInput.classList.add('is-valid');
+                //empty the content of div with id images
+                document.getElementById('images').innerHTML = "";
+                urlInput.nextElementSibling.textContent="";
+                loadXMLDoc(urlValue)
+                // alert('URL is valid: ' + urlValue);
+                // Further processing can be done here
+            }
+        });
+
+        function loadImages(xml) {
+			let i;
+			let xmlDoc = xml.responseXML;
+			var duplicates = [];
+			var all = [];
+			let x = xmlDoc.getElementsByTagName("item");
+			console.log("--total items", x);
+            if(x.length == 0) {
+                alert('No data found. Please check the url.');
+                return;
+            }
+            // add the value of x in count div
+            document.querySelector('.count').textContent = `Total items: ${x.length}`;
+			// // Start to fetch the data by using TagName 
+			var highest = 0;
+			var container = document.getElementById("images");
+			for (i = 0; i < x.length; i++) {
+				var item = x[i];
+				var img = item.getElementsByTagName("g:image_link");
+				var id = item.getElementsByTagName("g:id")[0].innerHTML;
+				var title = item.getElementsByTagName("g:title")[0].innerHTML;
+				if(img && img[0] && img[0].innerHTML) {
+					var src = img[0].innerHTML;
+					let divContainer = document.createElement('div');
+					let text = document.createElement('div');
+					text.textContent = "Prod " + (i+1) + " - " + id;
+					text.classList.add("text");
+		            divContainer.appendChild(text);
+
+					let imgelem = document.createElement('img');
+		            imgelem.src =src;
+					divContainer.classList.add("item-single");
+
+		            divContainer.appendChild(imgelem);
+                    let text2 = document.createElement('div');
+					text2.textContent = title;
+					text2.classList.add("title");
+		            divContainer.appendChild(text2);
+		            container.appendChild(divContainer);
+				}
+			}
+
+			
+		}
+
+        function loadXMLDoc(urlValue) {
+			let xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function () {
+
+				if (this.readyState == 4){
+                    //show the button with id sub-button
+                    document.getElementById('sub-button').style.display = 'inline-block';
+                    
+                    //hide the spinner
+                    document.getElementById('spinner').style.display = 'none';
+                    if(this.status == 200) {
+					    loadImages(this);
+                    } else {
+                        alert('No data found. Please check the url.');
+                    }
+                    
+				}
+                
+			};
+
+            //hide the button with id sub-button
+            document.getElementById('sub-button').style.display = 'none';
+
+            //show the spinner
+            document.getElementById('spinner').style.display = 'inline-block';
+
+
+            xmlhttp.open("GET", urlValue , true);
+			xmlhttp.send();
+		}
+    </script>
+</body>
+</html>
