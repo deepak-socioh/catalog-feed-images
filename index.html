@@ -10,6 +10,7 @@
     <style type="text/css">
 		img {
 			width:200px;
+            height: 200px;
             border: 0.1px solid rgb(128 128 128 / 25%)
 		}
 		.item-single {
@@ -30,28 +31,82 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        .radio-container {
+            margin-bottom: 1rem;
+            padding-left: 1rem;
+        }
+
+        .form-check {
+            margin-right: 1rem;
+        }
+        .csv-options-message {
+            display: none;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .single-checkbox > label {
+            margin-right: 1rem;
+            word-break: break-word;
+        }
+        .single-checkbox > input {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .single-checkbox {
+            flex: 0 0 24%;
+            align-items: center;
+            display: flex;
+            margin-bottom: 5px;
+        
+        }
 	</style>
 </head>
 <body>
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div style="flex: 0 0 100%;">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Enter Meta Catalog Feed URL</h5>
-                        <form id="urlForm" class="row">
-                            <div class="form-group col-9" >
-                                <input type="text" class="form-control" id="urlInput" placeholder="Enter URL">
-                                <div class="invalid-feedback">
-                                    Please enter a valid URL.
+                        <form id="urlForm">
+                            <div class="row radio-container">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="actionOption" id="actionOption1" checked>
+                                    <label class="form-check-label" for="actionOption1">
+                                        See Feed Images
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="actionOption" id="actionOption2" >
+                                    <label class="form-check-label" for="actionOption2">
+                                      Download CSV
+                                    </label>
+                                  </div>
+                                
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-9" >
+                                    <input type="text" class="form-control" id="urlInput" placeholder="Enter URL">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid URL.
+                                    </div>
+                                </div>
+                                <button id="sub-button" style="height: 38px;" type="submit" class="btn btn-primary col-3">Submit</button>
+                            
+                                <div id="spinner" class="spinner-border" role="status">
+                                    <span class="visually-hidden"></span>
                                 </div>
                             </div>
-                            <button id="sub-button" style="height: 38px;" type="submit" class="btn btn-primary col-3">Submit</button>
-                            
-                            <div id="spinner" class="spinner-border" role="status">
-                                <span class="visually-hidden"></span>
+                            <div class="csv-options-message">
+                                <div>Please select the fields you want to inlcude in csv:</div>
+
                             </div>
                         </form>
+                        
                     </div>
                 </div>
             </div>
@@ -65,8 +120,50 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        let allcolumns = ['g:id', 'g:item_group_id', 'g:title', 'g:description', 'g:product_type', 'g:link', 'quantity_to_sell_on_facebook', 'g:inventory', 'g:image_link', 'g:condition', 'g:availability', 'g:brand', 'g:mpn', 'g:shipping_weight', 'g:size', 'g:google_product_category', 'g:sale_price', 'g:price', 'g:color'];
+        //create a div with checkboxes for each elements in allcolumns
+        var checkboxContainerDiv = document.createElement('div');
+        checkboxContainerDiv.classList.add('checkbox-group');
+        allcolumns.forEach(function(col) {
+            var checkbox = document.createElement('input');
+            let checkboxDiv = document.createElement('div');
+            checkbox.type = 'checkbox';
+            checkbox.id = col;
+            checkbox.value = col;
+            //make checkbox selected by default
+            checkbox.checked = true;
+            checkboxDiv.classList.add('single-checkbox');
+            checkboxDiv.appendChild(checkbox);
+            var label = document.createElement('label');
+            label.htmlFor = col;
+            label.appendChild(document.createTextNode(col));
+            checkboxDiv.appendChild(label);
+            checkboxContainerDiv.appendChild(checkboxDiv);
+        });
+
+        // add checkboxDiv to the div with class csv-options-message
+        document.querySelector('.csv-options-message').appendChild(checkboxContainerDiv);
+        // checkboxContainerDiv.style.display = 'none'; 
+        
+
+        
         //hide the spinner
         document.getElementById('spinner').style.display = 'none';
+        window.selectedAction = 'actionOption1';
+        //add an event listener to radio buttons
+        document.querySelectorAll('input[type=radio]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                window.selectedAction = this.id;
+                if(this.id == 'actionOption2') {
+                    document.querySelector('.csv-options-message').style.display = 'block';
+                    // document.querySelector('.csv-options-message').innerHTML = 'Please note that the CSV will contain the following fields: ' + allcolumns.join(', ');
+                } else {
+                    document.querySelector('.csv-options-message').style.display = 'none';
+                }
+            });
+        });
+
+        // Add an event listener to the form
         document.getElementById('urlForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the default form submission
             document.querySelector('.count').textContent = "";
@@ -146,13 +243,27 @@
 			xmlhttp.onreadystatechange = function () {
 
 				if (this.readyState == 4){
-                    //show the button with id sub-button
+                    // show the button with id sub-button
                     document.getElementById('sub-button').style.display = 'inline-block';
                     
                     //hide the spinner
                     document.getElementById('spinner').style.display = 'none';
+
+                    //enable radios, checkboxes and url input
+                    document.querySelectorAll('input[type=radio]').forEach(function(radio) {
+                        radio.disabled = false;
+                    });
+                    document.querySelectorAll('.single-checkbox input').forEach(function(checkbox) {
+                        checkbox.disabled = false;
+                    });
+                    document.getElementById('urlInput').disabled = false;
+                    
                     if(this.status == 200) {
-					    loadImages(this);
+                       if(window.selectedAction == 'actionOption1') {
+                            loadImages(this);
+                        } else {
+                            downloadCSV(this);
+                        }
                     } else {
                         alert('No data found. Please check the url.');
                     }
@@ -167,9 +278,100 @@
             //show the spinner
             document.getElementById('spinner').style.display = 'inline-block';
 
+            //disable all checkboxes
+            document.querySelectorAll('.single-checkbox input').forEach(function(checkbox) {
+                checkbox.disabled = true;
+            });
+
+            //disable all radio buttons
+            document.querySelectorAll('input[type=radio]').forEach(function(radio) {
+                radio.disabled = true;
+            });
+
+            //disable the url input
+            document.getElementById('urlInput').disabled = true;
 
             xmlhttp.open("GET", urlValue , true);
 			xmlhttp.send();
+		}
+
+        function fileName(){
+		    //return name as todays full date
+		    var today = new Date();
+		    var dd = today.getDate();
+		    var mm = today.getMonth()+1; //January is 0!
+		    var yyyy = today.getFullYear();
+		    var hh = today.getHours();
+		    var min = today.getMinutes();
+		    var sec = today.getSeconds();
+		    var ms = today.getMilliseconds();
+		    if(dd<10) {
+		        dd = '0'+dd
+		    }
+		    if(mm<10) {
+		        mm = '0'+mm
+		    }
+		    if(hh<10) {
+		        hh = '0'+hh
+		    }
+		    if(min<10) {
+		        min = '0'+min
+		    }
+		    if(sec<10) {
+		        sec = '0'+sec
+		    }
+		    return yyyy + '-' + mm + '-' + dd + ':' + hh + ':' + min;
+
+		}
+
+		function downloadCSV(xml) {
+			let i;
+			let xmlDoc = xml.responseXML;
+			
+			let x = xmlDoc.getElementsByTagName("item");
+			console.log("--total items", x.length)
+			var highest = 0;
+			//add fields that you want to include in csv
+			
+			var finalCSVData = [];
+            let selectedColumns = [];
+            document.querySelectorAll('.single-checkbox input').forEach(function(checkbox) {
+                if(checkbox.checked) {
+                    selectedColumns.push(checkbox.value);
+                }
+            });
+			finalCSVData.push(selectedColumns);
+			for (i = 0; i < x.length; i++) {
+				var item = x[i];
+				var itemData = [];
+				selectedColumns.forEach(function(col){
+					var value = "--";
+					if(item.getElementsByTagName(col) && item.getElementsByTagName(col)[0] && item.getElementsByTagName(col)[0].childNodes && item.getElementsByTagName(col)[0].childNodes[0] && item.getElementsByTagName(col)[0].childNodes[0].nodeValue){
+						value = item.getElementsByTagName(col)[0].childNodes[0].nodeValue;
+
+					}
+					itemData.push('"'+value+'"');
+				});
+				finalCSVData.push(itemData);	
+			}
+            console.log("--finalCSVData",finalCSVData);
+            let name = "meta_feed_" + fileName() + ".csv";
+            console.log("--name",name);
+
+			let csvContent = "data:text/csv;charset=utf-8,";
+			console.log("csvContent",csvContent);
+			finalCSVData.forEach(function(rowArray) {
+			    let row = rowArray.join(",");
+			    csvContent += row + "\r\n";
+			});
+			var encodedUri = encodeURI(csvContent);
+			var link = document.createElement("a");
+			link.setAttribute("href", encodedUri);
+			
+			link.setAttribute("download", name);
+			document.body.appendChild(link); 
+
+			link.click(); 
 		}
     </script>
 </body>
