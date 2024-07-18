@@ -216,7 +216,12 @@
 				var item = x[i];
 				var img = item.getElementsByTagName("g:image_link");
 				var id = item.getElementsByTagName("g:id")[0].innerHTML;
-				var title = item.getElementsByTagName("g:title")[0].innerHTML;
+                var titlecontainer = item.getElementsByTagName("g:title");
+                if(titlecontainer && titlecontainer[0] && titlecontainer[0].innerHTML) {
+                    var title = titlecontainer[0].innerHTML;
+                } else {
+                    var title = "";
+                }
 				if(img && img[0] && img[0].innerHTML) {
 					var src = img[0].innerHTML;
 					let divContainer = document.createElement('div');
