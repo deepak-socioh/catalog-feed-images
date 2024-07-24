@@ -127,7 +127,7 @@
         </div>
         
         <form class="form-search row" id="searchForm">
-            <input class="form-control mr-sm-2" style="width: auto;display: inline-flex;" type="search" id="searchInput" placeholder="Search" aria-label="Search">
+            <input class="form-control mr-sm-2" style="width: auto;display: inline-flex;" type="text" id="searchInput" placeholder="Search" aria-label="Search">
             <div class="count"></div>
         </form>
         <div id="images"></div>
@@ -187,8 +187,10 @@
         document.getElementById('urlForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the default form submission
             document.querySelector('.count').textContent = "";
-            // hide searchForm
+            // hide searchForm 
             document.getElementById('searchForm').style.display = 'none';
+            //empty search input
+            document.getElementById('searchInput').value = "";
             var urlInput = document.getElementById('urlInput');
             var urlValue = urlInput.value.trim();
 
