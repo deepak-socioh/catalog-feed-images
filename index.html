@@ -65,6 +65,17 @@
             margin-bottom: 5px;
         
         }
+        .form-search {
+            margin-top: 10px;
+            align-items: center;
+        }
+        .count {
+            margin-left: 1rem;
+        }
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
 	</style>
 </head>
 <body>
@@ -114,7 +125,11 @@
                 </div>
             </div>
         </div>
-        <div class="count"></div>
+        
+        <form class="form-search row" id="searchForm">
+            <input class="form-control mr-sm-2" style="width: auto;display: inline-flex;" type="search" id="searchInput" placeholder="Search" aria-label="Search">
+            <div class="count"></div>
+        </form>
         <div id="images"></div>
     </div>
 
@@ -152,6 +167,8 @@
         
         //hide the spinner
         document.getElementById('spinner').style.display = 'none';
+        // hide searchForm
+        document.getElementById('searchForm').style.display = 'none';
         window.selectedAction = 'actionOption1';
         //add an event listener to radio buttons
         document.querySelectorAll('input[type=radio]').forEach(function(radio) {
@@ -170,6 +187,8 @@
         document.getElementById('urlForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the default form submission
             document.querySelector('.count').textContent = "";
+            // hide searchForm
+            document.getElementById('searchForm').style.display = 'none';
             var urlInput = document.getElementById('urlInput');
             var urlValue = urlInput.value.trim();
 
@@ -242,7 +261,8 @@
 		            container.appendChild(divContainer);
 				}
 			}
-
+            // show searchForm
+            document.getElementById('searchForm').style.display = 'flex';
 			
 		}
 
@@ -381,6 +401,38 @@
 
 			link.click(); 
 		}
+
+
+        //add an event listener to the search form 
+        document.getElementById('searchInput').addEventListener('keyup', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            var searchInput = document.getElementById('searchInput');
+            var searchValue = searchInput.value.trim();
+            var allItems = document.querySelectorAll('.item-single');
+            if (!searchValue) {
+                allItems.forEach(function(item) {
+                    item.style.display = 'inline-block';
+                });
+                document.querySelector('.count').textContent = `Total items: ${allItems.length}`;
+            } else {
+                var count = 0;
+                allItems.forEach(function(item) {
+                    var title = item.querySelector('.title').textContent;
+                    var id = item.querySelector('.text').textContent;
+                    if((title.toLowerCase().includes(searchValue.toLowerCase())) || (id.toLowerCase().includes(searchValue.toLowerCase()))) {
+                        count++;
+                        item.style.display = 'inline-block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                if(count == 0) {
+                    document.querySelector('.count').textContent = `No items match the search criteria`;
+                } else {
+                    document.querySelector('.count').textContent = `${count} out of ${allItems.length} items match the search criteria`;
+                }
+            }
+        });
     </script>
 </body>
 </html>
