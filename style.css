@@ -1,0 +1,91 @@
+img {
+    width: 200px;
+    height: 200px;
+    border: 0.1px solid rgb(128 128 128 / 25%)
+}
+
+.item-single {
+    display: inline-block;
+    margin-bottom: 10px;
+    border: 1px solid grey;
+    margin-top: 10px;
+    margin-right: 10px;
+    padding: 5px;
+}
+
+.text {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.title {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.radio-container {
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+}
+
+.form-check {
+    margin-right: 1rem;
+}
+
+.csv-options-message {
+    display: none;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.single-checkbox>label {
+    margin-right: 1rem;
+    word-break: break-word;
+}
+
+.single-checkbox>input {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.single-checkbox {
+    flex: 0 0 24%;
+    align-items: center;
+    display: flex;
+    margin-bottom: 5px;
+
+}
+
+.filters {
+    margin-top: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+}
+
+.count {
+    margin-left: 1rem;
+}
+
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.btn-group {
+    align-items: center ;
+}
+
+.btn-group label {
+    margin-bottom: 0;
+    min-width: 125px;
+}
